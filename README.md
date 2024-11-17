@@ -1,1 +1,1 @@
-# DukeCampusEventsAISummary
+# DukeCampusEventsAISummarizer
