@@ -26,20 +26,25 @@ with sync_playwright() as p:
     #Parse HTML Content
     soup = BeautifulSoup(html_content, "html.parser")
 
-    with open("page.html", "w", encoding="utf-8") as file:
-        file.write(html_content)
-
     #Section with all separate event pages
     content = soup.find("ul",id="divAllItems",class_="list-group")
-   
+    
+    index = 0
 
     events = []
     for event in content.find_all("li", class_="list-group-item"):  
+        if(index==0):
+            index+=1
+            continue
+        print("task")
         event_page = event.find("h3",class_="media-heading header-cg--h4").find("a").get('href')
         name = event.find("h3",class_="media-heading header-cg--h4").get_text()
         print(event_page)
         print(name)
- 
+        page.goto("https://duke.campusgroups.com"+event_page)
+        time.sleep(5)
+        index+=1
+
     # Close the browser
     browser.close()
 
