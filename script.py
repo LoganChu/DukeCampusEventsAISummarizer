@@ -2,10 +2,16 @@ import time
 import requests as rq
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
+from datetime import datetime
 
+now = datetime.now()
+
+current_day = now.day
+current_month = now.strftime("%b")
+current_year = now.year
 
 #Getting the URL for page with campus events on a specific date
-url = "https://duke.campusgroups.com/events?from_date=17+Nov+2024&to_date=17+Nov+2024"
+url = f"https://duke.campusgroups.com/events?from_date={current_day}+{current_month}+{current_year}&to_date={current_day}+{current_month}+{current_year}"
 #response = rq.get(url)
 
 with sync_playwright() as p:
@@ -36,18 +42,20 @@ with sync_playwright() as p:
         if(index==0):
             index+=1
             continue
-        print("task")
         event_page = event.find("h3",class_="media-heading header-cg--h4").find("a").get('href')
         name = event.find("h3",class_="media-heading header-cg--h4").get_text()
-        print(event_page)
-        print(name)
+        #print(event_page)
+        #print(name)
         page.goto("https://duke.campusgroups.com"+event_page)
+        contents = page.content()
+        soup = BeautifulSoup(contents, "html.parser")
+        description = " ".join((soup.find("div",id="event_details").find("div",class_="card-block").get_text()).split())
+        print(description)
         time.sleep(5)
         index+=1
 
     # Close the browser
     browser.close()
-
 
 #Testing to check actual HTML content of page. Some HTML is rendered through Javascript separately.
 """ 
@@ -62,23 +70,6 @@ if response.status_code == 200:
 else:
     print("Failed to retrieve the page")
     exit()
-"""
-
-
-
-
-
-
-"""
-    response = rq.get(event_page)
-    if response.status_code == 200:
-        html_content = response.text
-    else:
-        print("Failed to retrieve the page")
-        exit()
-    soup2 = BeautifulSoup(html_content, "html.parser")
-    description = soup2.find("div", class_="card-block").get_text()
-    events.append({"Event name": name, "Description": description})
 """
 
  
