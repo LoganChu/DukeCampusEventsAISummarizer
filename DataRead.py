@@ -29,7 +29,7 @@ with open("data.txt", "w", encoding="utf-8") as file:
 
         # Navigate to a URL
         page.goto(url)
-        time.sleep(5)
+        time.sleep(3)
 
         # Get the rendered page content
         html_content = page.content()
@@ -40,7 +40,9 @@ with open("data.txt", "w", encoding="utf-8") as file:
         login = soup.find("a",{"aria-label":"Sign In Section"}).get('href')
         page.goto("https://duke.campusgroups.com"+login)
 
-        time.sleep(5)
+
+
+        time.sleep(3)
 
         #Login Page Navigation
         login_content = page.content()
@@ -50,7 +52,7 @@ with open("data.txt", "w", encoding="utf-8") as file:
         login = soup_login.find("a",class_="btn btn--school btn--full-width").get('href')
         page.goto(login)
 
-        time.sleep(5)
+        time.sleep(3)
 
         #Getting username and password for .env file
         username = os.getenv("DUKE_USERNAME")
@@ -60,7 +62,7 @@ with open("data.txt", "w", encoding="utf-8") as file:
         page.fill("input#j_username", username) 
         page.fill("input#j_password", password)
 
-        time.sleep(5)
+        time.sleep(3)
         # Click the login button
         page.click("button#Submit")
 
@@ -68,8 +70,7 @@ with open("data.txt", "w", encoding="utf-8") as file:
         # Wait for navigation or other post-login actions
         page.wait_for_url("expected_url")  
         """
-
-        time.sleep(5)
+        time.sleep(3)
 
         #Section with all separate event pages
         content = soup.find("ul",id="divAllItems",class_="list-group")
@@ -82,20 +83,25 @@ with open("data.txt", "w", encoding="utf-8") as file:
                 continue
             event_page = event.find("h3",class_="media-heading header-cg--h4").find("a").get('href')
             name = event.find("h3",class_="media-heading header-cg--h4").get_text()
-            file.write(name + "\n")
+            file.write("Name of Event: "+name + "\n")
             page.goto("https://duke.campusgroups.com"+event_page)
+            time.sleep(3)
             contents = page.content()
             soup = BeautifulSoup(contents, "html.parser")
             description = " ".join((soup.find("div",id="event_details").find("div",class_="card-block").get_text()).split())
-            file.write(description + "\n")
-            time.sleep(100)
+            file.write("Description: " + description + "\n")
+            location = soup.find("div",id="event_main_card").find("div",attrs={"style":"display: inline-block; margin-left: 3px; width: calc(100% - 50px);"}).find_all("p")[0].get_text()
+            _time = soup.find("div",id="event_main_card").find("div",attrs={"style":"display: inline-block; margin-left: 3px;"}).find_all("p")[1].get_text()[0:-11]
+            file.write("Location: "+location + "\n")
+            file.write("Time: "+ _time+ "\n"+"\n")
+            time.sleep(3)
             index+=1
 
         # Close the browser
         browser.close()
 
 #Testing to check actual HTML content of page. Some HTML is rendered through Javascript separately.
-""" 
+"""
 with open("page.html", "w", encoding="utf-8") as file:
     file.write(response.text)
 """
